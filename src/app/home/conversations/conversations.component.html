@@ -1,0 +1,98 @@
+<div class="header">
+  <div class="search" style="display: flex">
+    {{ loggedInUser }}
+    <input
+      type="text"
+      placeholder="Search conversations"
+      [(ngModel)]="searchQuery"
+    />
+    <!-- <button>
+        <i class="bi bi-plus"></i>
+      </button> -->
+    <button
+      style="margin-left: 10px; height: 32px; margin-top: 1px"
+      type="button"
+      class="btn btn-outline-secondary btn-sm"
+      (click)="open(searchUserModal)"
+    >
+      <i class="bi bi-person-plus"></i>
+    </button>
+  </div>
+</div>
+<div class="list">
+  <div class="conversation" *ngFor="let conversation of conversations">
+    <img [src]="conversation.image" alt="Conversation Image" class="avatar" />
+    <div
+      (click)="
+        getConversationById(conversation.conversationId, conversation.name)
+      "
+      class="details"
+    >
+      <h5>{{ conversation.name }}</h5>
+      <p>{{ conversation.lastMessage }}</p>
+    </div>
+  </div>
+</div>
+
+<ng-template #searchUserModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Start a new conversation</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            id="search-users"
+            class="form-control"
+            placeholder="Search users"
+            name="users"
+            [(ngModel)]="searchUser"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            (click)="searchUsers()"
+            [disabled]="searchUser.length === 0"
+            type="button"
+          >
+            Search
+          </button>
+        </div>
+        <br />
+        <div class="list-group">
+          <div
+            type="button"
+            class="list-group-item list-group-item-action active"
+            *ngFor="let user of searchUserList"
+          >
+            <a (click)="createNewConversation(user)">
+              {{ user.username }}
+              ({{ user.email }})
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <!-- <button
+      type="button"
+      class="btn btn-outline-dark"
+      (click)="modal.close('Save click')"
+    >
+      Start conversation
+    </button> -->
+  </div>
+</ng-template>
+
+<!-- <button class="btn btn-lg btn-outline-primary" (click)="open(content)">
+  Launch demo modal
+</button> -->
+
+<hr />
