@@ -3,7 +3,7 @@ import { ChatService } from './../../services/chat.service';
 import { Component, OnInit } from '@angular/core';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
-import { Conversation } from 'src/app/models/model';
+import { Conversation, ConversationsAndMessages } from 'src/app/models/model';
 
 @Component({
   selector: 'app-conversations',
@@ -16,7 +16,12 @@ export class ConversationsComponent implements OnInit {
     private modalService: NgbModal,
     private chatService: ChatService,
     private eventEmitterService: EventEmitterService
-  ) {}
+  ) {
+    this.eventEmitterService.dataStoreUpdated.subscribe((data: []) => {
+      this.conversations = data;
+      // this.onNewMessagesArrive();
+    });
+  }
 
   loggedInUser: any;
 
@@ -24,26 +29,30 @@ export class ConversationsComponent implements OnInit {
     let user = localStorage.getItem('user');
     if (user) this.loggedInUser = user;
 
-    this.getActiveConversations();
+    // this.getActiveConversations();
+    this.getConversationsAndMessages();
   }
 
-  conversations: Conversation[] = [
+  conversations: ConversationsAndMessages[] = [
     // {
     //   name: 'John Doe',
     //   lastMessage: 'Hello, how are you?',
     //   image: 'https://via.placeholder.com/50x50',
     // },
-    // {
-    //   name: 'Jane Smith',
-    //   lastMessage: 'Are we meeting tomorrow?',
-    //   image: 'https://via.placeholder.com/50x50',
-    // },
-    // {
-    //   name: 'Alice Johnson',
-    //   lastMessage: 'See you later!',
-    //   image: 'https://via.placeholder.com/50x50',
-    // },
   ];
+
+  getConversationsAndMessages() {
+    this.chatService.getConversationsAndMessages(this.loggedInUser).subscribe(
+      (res: any) => {
+        console.log(res);
+        this.eventEmitterService.updateData(res);
+        // this.conversations = res;
+      },
+      (error: any) => {
+        console.log(error);
+      }
+    );
+  }
 
   getActiveConversations() {
     this.chatService.getActiveConversations(this.loggedInUser).subscribe(
@@ -61,34 +70,39 @@ export class ConversationsComponent implements OnInit {
     );
   }
 
-  getConversationById(id: string, receiver: string) {
+  selectConversationById(id: string, receiver: string) {
     this.currentReceiver = receiver;
-
-    this.chatService
-      .getConversationById(id, 1, this.loggedInUser, receiver)
-      .subscribe(
-        (res: any) => {
-          console.log(res);
-          this.eventEmitterService.updateData(id, res, receiver);
-        },
-        (error: any) => {
-          console.log(error);
-        }
-      );
+    this.eventEmitterService.changeConversation(id, receiver);
   }
+
+  // getConversationById(id: string, receiver: string) {
+  //   this.currentReceiver = receiver;
+
+  //   this.chatService
+  //     .getConversationById(id, 1, this.loggedInUser, receiver)
+  //     .subscribe(
+  //       (res: any) => {
+  //         console.log(res);
+  //         this.eventEmitterService.updateData(id, res, receiver);
+  //       },
+  //       (error: any) => {
+  //         console.log(error);
+  //       }
+  //     );
+  // }
 
   searchQuery: string = '';
 
-  get filteredConversations(): Conversation[] {
-    if (this.searchQuery.trim() === '') {
-      return this.conversations;
-    }
+  // get filteredConversations(): Conversation[] {
+  //   if (this.searchQuery.trim() === '') {
+  //     return this.conversations;
+  //   }
 
-    const query = this.searchQuery.trim().toLowerCase();
-    return this.conversations.filter((conversation) =>
-      conversation.name.toLowerCase().includes(query)
-    );
-  }
+  //   const query = this.searchQuery.trim().toLowerCase();
+  //   return this.conversations.filter((conversation) =>
+  //     conversation.name.toLowerCase().includes(query)
+  //   );
+  // }
 
   createNewConversation(user: any) {
     for (const element of this.conversations) {
@@ -98,22 +112,24 @@ export class ConversationsComponent implements OnInit {
       }
     }
 
-    this.chatService
-      .createNewConversation(user.username, this.loggedInUser)
-      .subscribe(
-        (res: any) => {
-          console.log(res);
-          this.conversations.push({
-            conversationId: res.conversationId,
-            name: res.name,
-            lastMessage: '',
-            image: 'https://via.placeholder.com/50x50',
-          });
-        },
-        (error: any) => {
-          console.log(error);
-        }
-      );
+    throw new Error('Method not implemented.');
+
+    // this.chatService
+    //   .createNewConversation(user.username, this.loggedInUser)
+    //   .subscribe(
+    //     (res: any) => {
+    //       console.log(res);
+    //       this.conversations.push({
+    //         conversationId: res.conversationId,
+    //         name: res.name,
+    //         // lastMessage: '',
+    //         // image: 'https://via.placeholder.com/50x50',
+    //       });
+    //     },
+    //     (error: any) => {
+    //       console.log(error);
+    //     }
+    //   );
   }
 
   closeResult = '';

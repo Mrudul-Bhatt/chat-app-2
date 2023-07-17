@@ -21,15 +21,20 @@
 </div>
 <div class="list">
   <div class="conversation" *ngFor="let conversation of conversations">
-    <img [src]="conversation.image" alt="Conversation Image" class="avatar" />
+    <!-- <img [src]="conversation.image" alt="Conversation Image" class="avatar" /> -->
     <div
       (click)="
-        getConversationById(conversation.conversationId, conversation.name)
+        selectConversationById(conversation.conversationId, conversation.name)
       "
       class="details"
     >
-      <h5>{{ conversation.name }}</h5>
-      <p>{{ conversation.lastMessage }}</p>
+      <h5>
+        {{ conversation.name }}
+        <span class="badge text-bg-secondary">{{
+          conversation.unreadMessages
+        }}</span>
+      </h5>
+      <!-- <p>{{ conversation.lastMessage }}</p> -->
     </div>
   </div>
 </div>

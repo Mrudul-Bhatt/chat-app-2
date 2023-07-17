@@ -1,5 +1,5 @@
 import { EventEmitterService } from '../../services/event-emitter.service';
-import { Message } from 'src/app/models/model';
+import { ConversationsAndMessages, Message } from 'src/app/models/model';
 import { ChatService } from '../../services/chat.service';
 import {
   AfterViewInit,
@@ -28,7 +28,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
     | undefined;
   @ViewChildren('item') itemElements: QueryList<any> | undefined;
 
-  messages: Message[] = [];
+  currentConversation: ConversationsAndMessages = {
+    conversationId: '',
+    name: '',
+    messages: [],
+    unreadMessages: 0,
+  };
+
   newMessage: string = '';
   isAtBottom: boolean = true;
   scrollTopValue: number = 0;
@@ -77,12 +83,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
     private chatService: ChatService,
     private eventEmitterService: EventEmitterService
   ) {
-    this.eventEmitterService.dataUpdated.subscribe((data: any) => {
-      this.messages = data.messages;
-      this.currentConversationId = data.conversationId;
-      this.currentReceiver = data.currentReceiver;
-      // this.onNewMessagesArrive();
-    });
+    this.eventEmitterService.currentSourceUpdated.subscribe(
+      (data: ConversationsAndMessages) => {
+        this.currentConversation.conversationId = data.conversationId;
+        this.currentConversation.messages = data.messages;
+        this.currentConversation.name = data.name;
+        // this.onNewMessagesArrive();
+      }
+    );
   }
 
   ngOnInit(): void {
@@ -141,12 +149,12 @@ export class ChatComponent implements OnInit, AfterViewInit {
         this.currentConversationId,
         this.username,
         this.newMessage.trim(),
-        this.currentReceiver
+        this.currentConversation.name
       );
       // .subscribe(
       //   (data: any) => {
       //     console.log('send message', data);
-      this.messages.push({
+      this.currentConversation.messages.push({
         sender: 'You',
         text: this.newMessage.trim(),
       });

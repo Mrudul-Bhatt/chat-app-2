@@ -10,9 +10,9 @@ export interface Message {
   text: string;
 }
 
-export interface MessagesByConversations {
+export interface ConversationsAndMessages {
   conversationId: string;
-  username: string;
-  userId: string;
+  name: string;
   messages: Message[];
+  unreadMessages: number;
 }

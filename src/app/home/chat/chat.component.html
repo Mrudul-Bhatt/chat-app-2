@@ -9,7 +9,7 @@
       <div class="chat-messages" style="margin-bottom: 40px">
         <div
           #item
-          *ngFor="let message of messages"
+          *ngFor="let message of currentConversation.messages"
           [ngClass]="getMessageClass(message.sender)"
           class="message"
         >

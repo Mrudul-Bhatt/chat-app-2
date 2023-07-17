@@ -1,7 +1,12 @@
-import {EventEmitterService} from './event-emitter.service';
-import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {HubConnection, HubConnectionBuilder, Subject,} from '@microsoft/signalr';
+import { EventEmitterService } from './event-emitter.service';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  Subject,
+} from '@microsoft/signalr';
+import { Message } from '../models/model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,16 +22,15 @@ export class ChatService {
   constructor(
     private http: HttpClient,
     private eventEmitterService: EventEmitterService
-  ) {
-  }
+  ) {}
 
   registerUser(user: any) {
     user = user.trim();
     this.user = user;
     return this.http.post(
       'https://localhost:7158/api/Chat/RegisterUser',
-      {name: user},
-      {responseType: 'text'}
+      { name: user },
+      { responseType: 'text' }
     );
   }
 
@@ -53,7 +57,7 @@ export class ChatService {
     //   this.messages = [...this.messages, newMessage];
     // });
 
-    this.chatConnection.on('NewMessage', (newMessage) => {
+    this.chatConnection.on('NewMessage', (newMessage: Message) => {
       console.log('Data coming from API Service', newMessage);
       this.eventEmitterService.updateDataInRealTime(newMessage);
     });
@@ -138,8 +142,10 @@ export class ChatService {
       `https://localhost:7158/api/Chat/GetLimitedConversationById?conversationId=${conversationId}&pageNo=${pageNo}&loggedInUser=${loggedInUser}`
     );
   }
+
+  getConversationsAndMessages(loggedInUser: any) {
+    return this.http.get(
+      `https://localhost:7158/api/Chat/GetConversationsAndMessageHistory?user=${loggedInUser}`
+    );
+  }
 }
-
-// https://localhost:7158/api/Chat/CreateConversation?receiverName=a&userId=a
-
-// https://localhost:7158/api/Chat/GetUserByName?name=john
